@@ -4,7 +4,7 @@
 
 Wardle is a Wordle clone with a turn-based twist. The player will race against a CPU to guess a 5-letter word in 6 tries or fewer.
 
-![Wardle Figma](https://imgur.com/a/Gcxe2on)
+![Wardle Figma](/Wardle.png)
 
 **Technical Requirements**
 

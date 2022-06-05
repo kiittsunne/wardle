@@ -1,0 +1,214 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+:root {
+  --background-standard: hsl(240, 3%, 7%);
+  --grey-standard: hsl(206, 3%, 48%);
+  --yellow-standard: hsl(51, 52%, 55%);
+  --green-standard: hsl(114, 28%, 53%);
+}
+
+body {
+  background-color: var(--background-standard);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 1em;
+  /* sauce: https://developer.mozilla.org/en-US/docs/Web/CSS/clamp */
+  font-size: clamp(0.5rem, 2.5vmin, 1.5rem);
+}
+
+h1 {
+  color: white;
+  text-align: center;
+}
+
+.keyboard {
+  display: grid;
+  /* sauce (couldn't get the staggered keys look without this) - https://stackoverflow.com/questions/51284823/how-to-offset-a-div-in-a-css-grid */
+  grid-template-columns: repeat(20, minmax(auto, 1.25em));
+  grid-auto-rows: 3em;
+  gap: 0.25em;
+  justify-content: center;
+  margin-bottom: 3em;
+}
+
+.key {
+  font-size: inherit;
+  grid-column: span 2;
+  border: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: hsl(
+    var(--hue, 200),
+    var(--saturation, 1%),
+    calc(var(--lightness-offset, 0%) + var(--lightness, 51%))
+  );
+  color: white;
+  fill: white;
+  text-transform: uppercase;
+  border-radius: 0.25em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.key.large {
+  grid-column: span 3;
+}
+
+.key > svg {
+  width: 1.75em;
+  height: 1.75em;
+}
+
+.key:hover,
+.key:focus {
+  --lightness-offset: 10%;
+}
+
+.key.bad {
+  --lightness: 23%;
+}
+
+.key.valid {
+  --hue: 49;
+  --saturation: 51%;
+  --lightness: 47%;
+}
+
+.key.placed {
+  --hue: 115;
+  --saturation: 29%;
+  --lightness: 43%;
+}
+
+.playerGrid {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  flex-grow: 1;
+  grid-template-columns: repeat(5, 4em);
+  grid-template-rows: repeat(6, 4em);
+  gap: 0.25em;
+  margin-bottom: 1em;
+}
+
+.tile {
+  color: white;
+  border: 0.05em solid hsl(240, 2%, 23%);
+  font-size: 2em;
+  text-transform: capitalize;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  user-select: none;
+  transition: transform 150ms linear;
+}
+
+.tile[data-state="active"] {
+  border-color: hsl(200, 1%, 34%);
+}
+
+.tile[data-state="bad"] {
+  border: none;
+  background-color: hsl(240, 2%, 23%);
+}
+
+.tile[data-state="valid"] {
+  border: none;
+  background-color: hsl(49, 51%, 47%);
+}
+
+.tile[data-state="placed"] {
+  border: none;
+  background-color: hsl(114, 29%, 43%);
+}
+
+.alertContainer {
+  position: fixed;
+  top: 10vh;
+  left: 50vw;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.alert {
+  pointer-events: none;
+  background-color: white;
+  padding: 0.75em;
+  border-radius: 0.25em;
+  opacity: 0.7;
+  transition: opacity 500ms ease-in-out;
+  margin-bottom: 0.5em;
+}
+
+.alert.hide {
+  opacity: 0;
+}
+
+.alert:last-child {
+  margin-bottom: 0;
+}
+
+.tile.shake {
+  animation: shake 200ms ease-in-out;
+}
+
+.tile.flip {
+  transform: rotateX(90deg);
+}
+
+.tile.dance {
+  animation: dance 500ms;
+}
+
+@keyframes shake {
+  10% {
+    transform: translateX(-5%);
+  }
+  30% {
+    transform: translateX(5%);
+  }
+  50% {
+    transform: translateX(-7.5%);
+  }
+  70% {
+    transform: translateX(7.5%);
+  }
+  90% {
+    transform: translateX(-5%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes dance {
+  20% {
+    transform: translateY(-50%);
+  }
+  40% {
+    transform: translateY(5%);
+  }
+  60% {
+    transform: translateY(-20%);
+  }
+  80% {
+    transform: translateY(2.5%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}

@@ -96,16 +96,16 @@ fetch("words.json")
 
     // passes letters/ guess words input through onscreen keyboard to other relevant functions
     function handleOnscreenKeyboard(event) {
+      if (event.target.matches("[data-delete]")) {
+        deleteLetter();
+        return;
+      }
       if (event.target.matches("[data-key]")) {
         setLetter(event.target.dataset.key);
         return;
       }
       if (event.target.matches("[data-enter]")) {
         submitGuess();
-        return;
-      }
-      if (event.target.matches("[data-delete]")) {
-        deleteLetter();
         return;
       }
     }

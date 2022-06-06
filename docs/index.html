@@ -10,83 +10,86 @@
   </head>
   <body>
     <h1>Wardle</h1>
-    <div class="alertContainer" data-alert-container></div>
-    <div class="playerGrid" data-player-grid>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-      <div class="tile"></div>
-    </div>
-    <div class="keyboard" data-keyboard>
-      <button class="key" data-key="Q">Q</button>
-      <button class="key" data-key="W">W</button>
-      <button class="key" data-key="E">E</button>
-      <button class="key" data-key="R">R</button>
-      <button class="key" data-key="T">T</button>
-      <button class="key" data-key="Y">Y</button>
-      <button class="key" data-key="U">U</button>
-      <button class="key" data-key="I">I</button>
-      <button class="key" data-key="O">O</button>
-      <button class="key" data-key="P">P</button>
-      <div class="space"></div>
-      <button class="key" data-key="A">A</button
-      ><button class="key" data-key="S">S</button
-      ><button class="key" data-key="D">D</button
-      ><button class="key" data-key="F">F</button
-      ><button class="key" data-key="G">G</button
-      ><button class="key" data-key="H">H</button
-      ><button class="key" data-key="J">J</button
-      ><button class="key" data-key="K">K</button
-      ><button class="key" data-key="L">L</button>
-      <div class="space"></div>
-      <button data-enter class="key large">Enter</button>
-      <button class="key" data-key="Z">Z</button
-      ><button class="key" data-key="X">X</button
-      ><button class="key" data-key="C">C</button
-      ><button class="key" data-key="V">V</button
-      ><button class="key" data-key="B">B</button
-      ><button class="key" data-key="N">N</button
-      ><button class="key" data-key="M">M</button>
-      <button data-delete class="key large">
-        <!-- svg attribution: Backspace by Rflor from NounProject.com (https://thenounproject.com/icon/backspace-287822/) -->
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24"
-          viewBox="0 0 700 500"
-          width="24"
-        >
-          <path
-            fill="var(--color-tone-1)"
-            d="m583.33 46.875v-0.20703h-280c-12.832 0-30.309 7.8398-38.852 17.453l-155.66 175.12c-8.5391 9.5898-8.5391 25.27 0 34.906l155.66 175.12c8.543 9.5664 26.02 17.406 38.852 17.406h280c25.762 0 46.668-20.906 46.668-46.668v-326.46c0-25.781-20.906-46.668-46.668-46.668zm-49.371 282.5c11.387 11.41 11.387 29.867 0 41.254-5.6719 5.6914-13.137 8.5391-20.625 8.5391-7.4883 0-14.957-2.8477-20.625-8.5391l-72.711-72.707-72.707 72.707c-5.6914 5.6914-13.16 8.5391-20.625 8.5391-7.4648 0-14.934-2.8477-20.625-8.5391-11.387-11.41-11.387-29.867 0-41.254l72.707-72.707-72.707-72.707c-11.387-11.41-11.41-29.867 0-41.254 11.41-11.387 29.867-11.387 41.254 0l72.703 72.707 72.707-72.707c11.41-11.387 29.867-11.41 41.254 0 11.387 11.41 11.387 29.867 0 41.254l-72.707 72.707z"
-          ></path>
-        </svg>
-      </button>
+      <div id="player">
+        <div class="alertContainer" data-alert-container></div>
+        <div class="playerGrid" data-player-grid>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+          <div class="tile"></div>
+        </div>
+        <div class="keyboard" data-keyboard>
+          <button class="key" data-key="Q">Q</button>
+          <button class="key" data-key="W">W</button>
+          <button class="key" data-key="E">E</button>
+          <button class="key" data-key="R">R</button>
+          <button class="key" data-key="T">T</button>
+          <button class="key" data-key="Y">Y</button>
+          <button class="key" data-key="U">U</button>
+          <button class="key" data-key="I">I</button>
+          <button class="key" data-key="O">O</button>
+          <button class="key" data-key="P">P</button>
+          <div class="space"></div>
+          <button class="key" data-key="A">A</button
+          ><button class="key" data-key="S">S</button
+          ><button class="key" data-key="D">D</button
+          ><button class="key" data-key="F">F</button
+          ><button class="key" data-key="G">G</button
+          ><button class="key" data-key="H">H</button
+          ><button class="key" data-key="J">J</button
+          ><button class="key" data-key="K">K</button
+          ><button class="key" data-key="L">L</button>
+          <div class="space"></div>
+          <button data-enter class="key large">Enter</button>
+          <button class="key" data-key="Z">Z</button
+          ><button class="key" data-key="X">X</button
+          ><button class="key" data-key="C">C</button
+          ><button class="key" data-key="V">V</button
+          ><button class="key" data-key="B">B</button
+          ><button class="key" data-key="N">N</button
+          ><button class="key" data-key="M">M</button>
+          <button data-delete class="key large">
+            <!-- svg attribution: Backspace by Rflor from NounProject.com (https://thenounproject.com/icon/backspace-287822/) -->
+            <svg
+              data-delete
+              xmlns="http://www.w3.org/2000/svg"
+              height="24"
+              viewBox="0 0 700 500"
+              width="24"
+            >
+              <path
+                fill="var(--color-tone-1)"
+                d="m583.33 46.875v-0.20703h-280c-12.832 0-30.309 7.8398-38.852 17.453l-155.66 175.12c-8.5391 9.5898-8.5391 25.27 0 34.906l155.66 175.12c8.543 9.5664 26.02 17.406 38.852 17.406h280c25.762 0 46.668-20.906 46.668-46.668v-326.46c0-25.781-20.906-46.668-46.668-46.668zm-49.371 282.5c11.387 11.41 11.387 29.867 0 41.254-5.6719 5.6914-13.137 8.5391-20.625 8.5391-7.4883 0-14.957-2.8477-20.625-8.5391l-72.711-72.707-72.707 72.707c-5.6914 5.6914-13.16 8.5391-20.625 8.5391-7.4648 0-14.934-2.8477-20.625-8.5391-11.387-11.41-11.387-29.867 0-41.254l72.707-72.707-72.707-72.707c-11.387-11.41-11.41-29.867 0-41.254 11.41-11.387 29.867-11.387 41.254 0l72.703 72.707 72.707-72.707c11.41-11.387 29.867-11.41 41.254 0 11.387 11.41 11.387 29.867 0 41.254l-72.707 72.707z"
+              ></path>
+            </svg>
+          </button>
+        </div>
     </div>
   </body>
 </html>

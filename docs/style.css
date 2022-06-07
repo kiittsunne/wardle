@@ -23,7 +23,12 @@ body {
   font-size: clamp(0.5rem, 2.5vmin, 1.5rem);
 }
 
-#gridContainer {
+h1 {
+  color: white;
+  text-align: center;
+}
+
+#mainContainer {
   height: 80vh;
   width: 90vw;
   margin: auto;
@@ -39,9 +44,51 @@ body {
   margin: 0.8em;
 }
 
-h1 {
-  color: white;
-  text-align: center;
+#gridContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.alertContainer {
+  position: fixed;
+  top: 10vh;
+  left: 50vw;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.alert {
+  pointer-events: none;
+  background-color: white;
+  padding: 0.75em;
+  border-radius: 0.25em;
+  opacity: 0.7;
+  transition: opacity 500ms ease-in-out;
+  margin-bottom: 0.5em;
+}
+
+.alert.hide {
+  opacity: 0;
+}
+
+.alert:last-child {
+  margin-bottom: 0;
+}
+
+.playerGrid,
+.cpuGrid {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  flex-grow: 1;
+  grid-template-columns: repeat(5, 3em);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 0.25em;
 }
 
 .keyboard {
@@ -65,7 +112,7 @@ h1 {
   background-color: hsl(
     var(--hue, 200),
     var(--saturation, 1%),
-    calc(var(--lightness-offset, 0%) + var(--lightness, 31%))
+    calc(var(--lightness-offset, 0%) + var(--lightness, 48%))
   );
   color: white;
   fill: white;
@@ -104,28 +151,10 @@ h1 {
   --lightness: 43%;
 }
 
-#player {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .playerLabel {
   text-align: center;
   margin: 1.5em;
   color: white;
-}
-
-.playerGrid {
-  display: grid;
-  justify-content: center;
-  align-content: center;
-  flex-grow: 1;
-  grid-template-columns: repeat(5, 3em);
-  grid-template-rows: repeat(6, 1fr);
-  gap: 0.25em;
-  /* margin-bottom: 1em; */
 }
 
 .tile {
@@ -159,35 +188,6 @@ h1 {
 .tile[data-state="placed"] {
   border: none;
   background-color: hsl(114, 29%, 43%);
-}
-
-.alertContainer {
-  position: fixed;
-  top: 10vh;
-  left: 50vw;
-  transform: translateX(-50%);
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.alert {
-  pointer-events: none;
-  background-color: white;
-  padding: 0.75em;
-  border-radius: 0.25em;
-  opacity: 0.7;
-  transition: opacity 500ms ease-in-out;
-  margin-bottom: 0.5em;
-}
-
-.alert.hide {
-  opacity: 0;
-}
-
-.alert:last-child {
-  margin-bottom: 0;
 }
 
 .tile.shake {
@@ -231,7 +231,7 @@ h1 {
     transform: translateY(5%);
   }
   60% {
-    transform: translateY(-20%);
+    transform: translateY(-15%);
   }
   80% {
     transform: translateY(2.5%);

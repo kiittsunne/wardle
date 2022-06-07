@@ -10,6 +10,7 @@ const DANCE_ANIMATION_DURATION = 300; // total animation duration for tile dance
 //// ELEMENT NAMES
 ///////////////////////////////////////////////
 const playerGrid = document.querySelector("[data-player-grid]");
+const cpuGrid = document.querySelector("[data-cpu-grid]");
 const playerKeyboard = document.querySelector("[data-player-keyboard]");
 const cpuKeyboard = document.querySelector("[data-cpu-keyboard]");
 const alertContainer = document.querySelector("[data-alert-container");
@@ -33,9 +34,13 @@ fetch("words.json")
     // checks guess word against target word letter-by-letter and assigns grid tiles bad/valid/placed classes
     function evaluateGuess(tile, index, array, guessWord) {
       const letter = tile.dataset.letter;
-      const key = playerKeyboard.querySelector(
-        `[data-player-key="${letter}"i]`
-      );
+      let key;
+      if (tile.dataset.owner === "cpu") {
+        key = cpuKeyboard.querySelector(`[data-cpu-key="${letter}"i]`);
+      } else if (tile.dataset.owner === "player") {
+        key = playerKeyboard.querySelector(`[data-player-key="${letter}"i]`);
+      }
+
       setTimeout(() => {
         tile.classList.add("flip");
       }, (index * FLIP_ANIMATION_DURATION) / 2);
@@ -53,15 +58,33 @@ fetch("words.json")
           key.classList.add("bad");
         }
 
-        if (index === array.length - 1) {
-          tile.addEventListener(
-            "transitionend",
-            () => {
-              handlePlayerInput();
-              checkWinCondition(guessWord, array);
-            },
-            { once: true }
-          );
+        if (array[0].dataset.owner === "cpu") {
+          if (index === array.length - 1) {
+            tile.addEventListener(
+              "transitionend",
+              () => {
+                checkWinCondition(guessWord, array);
+                handlePlayerInput();
+                storeCpuMemory(array);
+              },
+              { once: true }
+            );
+          }
+        }
+
+        if (array[0].dataset.owner === "player") {
+          if (index === array.length - 1) {
+            tile.addEventListener(
+              "transitionend",
+              () => {
+                checkWinCondition(guessWord, array);
+                handleCpuInput();
+                storeCpuMemory(array);
+                generateCpuGuess();
+              },
+              { once: true }
+            );
+          }
         }
       });
     }
@@ -72,11 +95,10 @@ fetch("words.json")
         showAlert("Great Job!", 5000);
         danceTiles(tiles);
         blockPlayerInput();
+        blockCpuInput();
         return;
       }
-      const checkGuessesLeft = playerGrid.querySelectorAll(
-        ":not([data-letter])"
-      );
+      const checkGuessesLeft = cpuGrid.querySelectorAll(":not([data-letter])");
       if (checkGuessesLeft.length === 0) {
         showAlert(`The Word was ${targetWord.toUpperCase()}`, null);
         blockPlayerInput();
@@ -87,40 +109,62 @@ fetch("words.json")
     // PLAYER INTERACTIONS
     ///////////////////////////////////
     // listens for player input either through onscreen/ device keyboard
+    function handleCpuInput() {
+      document
+        .querySelector("#cpuSide")
+        .addEventListener("click", handleOnscreenKeyboard);
+    }
+    handleCpuInput();
+
+    function blockCpuInput() {
+      document
+        .querySelector("#cpuSide")
+        .removeEventListener("click", handleOnscreenKeyboard);
+    }
+
     function handlePlayerInput() {
-      document.addEventListener("click", handleOnscreenKeyboard);
+      document
+        .querySelector("#playerSide")
+        .addEventListener("click", handleOnscreenKeyboard);
       document.addEventListener("keydown", handleDeviceKeyboard);
     }
     handlePlayerInput();
-    // const qkey = document.querySelector(`[data-player-key="A"]`);
-    // let clickEvent = new Event("click", { bubbles: true });
-    // qkey.dispatchEvent(clickEvent);
+
     // blocks player from inputting a guess word
     function blockPlayerInput() {
-      document.removeEventListener("click", handleOnscreenKeyboard);
+      document
+        .querySelector("#playerSide")
+        .removeEventListener("click", handleOnscreenKeyboard);
       document.removeEventListener("keydown", handleDeviceKeyboard);
     }
 
     // passes letters/ guess words input through onscreen keyboard to other relevant functions
     function handleOnscreenKeyboard(event) {
+      // watches input by player
       if (event.target.matches("[data-player-delete]")) {
         deleteLetter();
         return;
       }
       if (event.target.matches("[data-player-key]")) {
-        setLetter(event.target.dataset.playerKey);
+        setLetter({ playerKey: event.target.dataset.key });
         return;
       }
       if (event.target.matches("[data-player-enter]")) {
-        submitGuess();
+        submitGuess([...getActivePlayerTiles()]);
         return;
+      }
+      // watches input by cpu
+      if (event.target.dataset.cpuKey.match(/^[A-Z]$/)) {
+        setLetter(event.target.dataset);
+      } else {
+        submitGuess([...getActiveCpuTiles()]);
       }
     }
 
     // passes letters/ guess words input through onscreen keyboard to other relevant functions
     function handleDeviceKeyboard(event) {
       if (event.key === "Enter") {
-        submitGuess();
+        submitGuess([...getActivePlayerTiles()]);
         return;
       }
       if (event.key === "Backspace" || event.key === "Delete") {
@@ -128,31 +172,63 @@ fetch("words.json")
         return;
       }
       if (event.key.match(/^[a-z]$/)) {
-        setLetter(event.key);
+        setLetter({ playerKey: event.key });
         return;
       }
     }
 
+    // let lettersArr = ["G", "L", "E", "A", "M"];
+    function submitCpuInput(lettersArr) {
+      lettersArr.push("GO");
+      let interval = 200;
+      let increment = 1;
+      let clickEvent = new Event("click", { bubbles: true });
+      // sauce: https://stackoverflow.com/questions/25256535/javascript-set-interval-for-each-array-value-setinterval-array-foreach/37215055#37215055
+      for (let i = 0; i <= WORD_LENGTH; i++) {
+        let runner = setTimeout(() => {
+          document
+            .querySelector(`[data-cpu-key="${lettersArr[i]}"]`)
+            .dispatchEvent(clickEvent);
+          clearTimeout(runner);
+        }, interval * increment);
+        increment++;
+      }
+    }
+
     // returns array of tiles (html elements) where player has keyed in some letter
-    function getActiveTiles() {
+    function getActivePlayerTiles() {
       return playerGrid.querySelectorAll('[data-state="active"]');
+    }
+
+    function getActiveCpuTiles() {
+      return cpuGrid.querySelectorAll('[data-state="active"]');
     }
 
     // fills 1 letter per tile only
     function setLetter(key) {
-      const activeTile = getActiveTiles();
-      if (activeTile.length >= WORD_LENGTH) return;
-      const nextTileToFill = playerGrid.querySelector(":not([data-letter])");
-      nextTileToFill.dataset.letter = key.toLowerCase();
-      nextTileToFill.innerHTML = key;
-      nextTileToFill.dataset.state = "active";
-      // console.log(playerGrid.querySelector("[data-letter]"));
-      // console.log(playerGrid.querySelector(":not([data-letter])"));
+      if (Object.keys(key)[0] === "playerKey") {
+        const activePlayerTile = getActivePlayerTiles();
+        if (activePlayerTile.length >= WORD_LENGTH) return;
+        const nextPlayerTileToFill = playerGrid.querySelector(
+          ":not([data-letter])"
+        );
+        nextPlayerTileToFill.dataset.letter = key.playerKey.toLowerCase();
+        nextPlayerTileToFill.innerHTML = key.playerKey;
+        nextPlayerTileToFill.dataset.state = "active";
+        nextPlayerTileToFill.dataset.owner = "player";
+      }
+      if (Object.keys(key)[0] === "cpuKey") {
+        const nextCpuTileToFill = cpuGrid.querySelector(":not([data-letter])");
+        nextCpuTileToFill.dataset.letter = key.cpuKey.toLowerCase();
+        nextCpuTileToFill.innerHTML = key.cpuKey;
+        nextCpuTileToFill.dataset.state = "active";
+        nextCpuTileToFill.dataset.owner = "cpu";
+      }
     }
 
     // allows onscreen/device keyboard backspace to remove letters from guess input
     function deleteLetter() {
-      const activeTiles = getActiveTiles();
+      const activeTiles = getActivePlayerTiles();
       const lastTile = activeTiles[activeTiles.length - 1];
       if (lastTile === undefined) return;
       lastTile.innerHTML = "";
@@ -161,43 +237,38 @@ fetch("words.json")
     }
 
     // onscreen/device keyboard enter will send guess word to evaluation engine, function has 3 responsibilities
-    function submitGuess() {
-      const activeTiles = [...getActiveTiles()];
-
+    function submitGuess(activeTiles) {
       // stringifies guessword for validation & submission to evaluation engine
       let guessWord = "";
       for (let i = 0; i < activeTiles.length; i++) {
         guessWord += activeTiles[i].dataset.letter;
       }
 
-      // validates that submitted guess word is at least 5 letters long, sets `shake` class for error animation/alert
       if (activeTiles.length < WORD_LENGTH) {
+        // validates that submitted guess word is at least 5 letters long, sets `shake` class for error animation/alert
         showAlert("Not Enough Letters");
         shakeTiles(activeTiles);
         return;
-      }
-
-      // validates that submitted word is in words.json, sets `shake` class for error animation/ alert
-      if (
+      } else if (
+        // validates that submitted word is in words.json, sets `shake` class for error animation/ alert
         activeTiles.length == WORD_LENGTH &&
         data.includes(guessWord) === false
       ) {
         showAlert("Not a Wardle Word");
         shakeTiles(activeTiles);
         return;
+      } else {
+        // once validated, player is blocked from submitting another guess word until evaluation engine is done
+        blockCpuInput();
+        blockPlayerInput;
       }
 
-      // once validated, player is blocked from submitting another guess word until evaluation engine is done
-      blockPlayerInput();
-      activeTiles.forEach((...params) => {
-        playerGuess.push(...params);
-      });
+      // submit validated cpu/player input to evaluation engine
       activeTiles.forEach((...params) => {
         // passes validated guessword to evaluation engine letter by letter
         evaluateGuess(...params, guessWord);
       });
     }
-    console.log(playerGuess);
 
     // error message for validation checks in submitGuess()
     function showAlert(message, duration = 200) {
@@ -248,8 +319,25 @@ fetch("words.json")
     ///////////////////////////////////
     // CPU ENGINE
     ///////////////////////////////////
+    const previousGuess = [];
+    const previousPlayerGuess = [];
 
-    const noTargetWord = data.filter((x) => x != targetWord);
-    const badLetters = [];
-    // console.log(badLetters);
+    function storeCpuMemory(array) {
+      let wordConstructor = [];
+      if (array[0].dataset.owner == "player") {
+        for (let i = 0; i < array.length; i++) {
+          wordConstructor.push(array[i].dataset.letter);
+        }
+        previousPlayerGuess.push(wordConstructor.join(""));
+      }
+    }
+
+    function generateCpuGuess() {
+      let selectedWord = "";
+      selectedWord = data[Math.floor(Math.random() * TOTAL_WORDS - 1)];
+      lettersArr = Array.from(selectedWord.toUpperCase());
+      previousGuess.push(selectedWord);
+      submitCpuInput(lettersArr);
+      // console.log(previousPlayerGuess);
+    }
   });

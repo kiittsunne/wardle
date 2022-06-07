@@ -23,6 +23,22 @@ body {
   font-size: clamp(0.5rem, 2.5vmin, 1.5rem);
 }
 
+#gridContainer {
+  height: 80vh;
+  width: 90vw;
+  margin: auto;
+  display: flex;
+  box-sizing: border-box;
+  padding: 0.5em;
+}
+
+#playerSide,
+#cpuSide {
+  width: 50%;
+  box-sizing: border-box;
+  margin: 0.8em;
+}
+
 h1 {
   color: white;
   text-align: center;
@@ -31,11 +47,11 @@ h1 {
 .keyboard {
   display: grid;
   /* sauce (couldn't get the staggered keys look without this) - https://stackoverflow.com/questions/51284823/how-to-offset-a-div-in-a-css-grid */
-  grid-template-columns: repeat(20, minmax(auto, 1.25em));
+  grid-template-columns: repeat(20, minmax(auto, 1em));
   grid-auto-rows: 3em;
   gap: 0.25em;
   justify-content: center;
-  margin-bottom: 3em;
+  bottom: 0;
 }
 
 .key {
@@ -49,13 +65,12 @@ h1 {
   background-color: hsl(
     var(--hue, 200),
     var(--saturation, 1%),
-    calc(var(--lightness-offset, 0%) + var(--lightness, 51%))
+    calc(var(--lightness-offset, 0%) + var(--lightness, 31%))
   );
   color: white;
   fill: white;
   text-transform: uppercase;
   border-radius: 0.25em;
-  cursor: pointer;
   user-select: none;
 }
 
@@ -68,9 +83,9 @@ h1 {
   height: 1.75em;
 }
 
-.key:hover,
-.key:focus {
+.player-keyboard > .key:hover {
   --lightness-offset: 10%;
+  cursor: pointer;
 }
 
 .key.bad {
@@ -89,15 +104,28 @@ h1 {
   --lightness: 43%;
 }
 
+#player {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.playerLabel {
+  text-align: center;
+  margin: 1.5em;
+  color: white;
+}
+
 .playerGrid {
   display: grid;
   justify-content: center;
   align-content: center;
   flex-grow: 1;
-  grid-template-columns: repeat(5, 4em);
-  grid-template-rows: repeat(6, 4em);
+  grid-template-columns: repeat(5, 3em);
+  grid-template-rows: repeat(6, 1fr);
   gap: 0.25em;
-  margin-bottom: 1em;
+  /* margin-bottom: 1em; */
 }
 
 .tile {

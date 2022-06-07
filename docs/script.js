@@ -10,8 +10,10 @@ const DANCE_ANIMATION_DURATION = 300; // total animation duration for tile dance
 //// ELEMENT NAMES
 ///////////////////////////////////////////////
 const playerGrid = document.querySelector("[data-player-grid]");
-const keyboard = document.querySelector("[data-keyboard]");
+const playerKeyboard = document.querySelector("[data-player-keyboard]");
+const cpuKeyboard = document.querySelector("[data-cpu-keyboard]");
 const alertContainer = document.querySelector("[data-alert-container");
+const playerGuess = [];
 
 ///////////////////////////////////////////////
 //// FETCH BLOCK: RETRIEVE WORDS.JSON DATA
@@ -31,10 +33,13 @@ fetch("words.json")
     // checks guess word against target word letter-by-letter and assigns grid tiles bad/valid/placed classes
     function evaluateGuess(tile, index, array, guessWord) {
       const letter = tile.dataset.letter;
-      const key = keyboard.querySelector(`[data-key="${letter}"i]`);
+      const key = playerKeyboard.querySelector(
+        `[data-player-key="${letter}"i]`
+      );
       setTimeout(() => {
         tile.classList.add("flip");
       }, (index * FLIP_ANIMATION_DURATION) / 2);
+
       tile.addEventListener("transitionend", () => {
         tile.classList.remove("flip");
         if (targetWord[index] === letter) {
@@ -79,7 +84,7 @@ fetch("words.json")
     }
 
     ///////////////////////////////////
-    // PLAYER GRID INTERACTIONS
+    // PLAYER INTERACTIONS
     ///////////////////////////////////
     // listens for player input either through onscreen/ device keyboard
     function handlePlayerInput() {
@@ -87,7 +92,9 @@ fetch("words.json")
       document.addEventListener("keydown", handleDeviceKeyboard);
     }
     handlePlayerInput();
-
+    // const qkey = document.querySelector(`[data-player-key="A"]`);
+    // let clickEvent = new Event("click", { bubbles: true });
+    // qkey.dispatchEvent(clickEvent);
     // blocks player from inputting a guess word
     function blockPlayerInput() {
       document.removeEventListener("click", handleOnscreenKeyboard);
@@ -96,15 +103,15 @@ fetch("words.json")
 
     // passes letters/ guess words input through onscreen keyboard to other relevant functions
     function handleOnscreenKeyboard(event) {
-      if (event.target.matches("[data-delete]")) {
+      if (event.target.matches("[data-player-delete]")) {
         deleteLetter();
         return;
       }
-      if (event.target.matches("[data-key]")) {
-        setLetter(event.target.dataset.key);
+      if (event.target.matches("[data-player-key]")) {
+        setLetter(event.target.dataset.playerKey);
         return;
       }
-      if (event.target.matches("[data-enter]")) {
+      if (event.target.matches("[data-player-enter]")) {
         submitGuess();
         return;
       }
@@ -139,6 +146,8 @@ fetch("words.json")
       nextTileToFill.dataset.letter = key.toLowerCase();
       nextTileToFill.innerHTML = key;
       nextTileToFill.dataset.state = "active";
+      // console.log(playerGrid.querySelector("[data-letter]"));
+      // console.log(playerGrid.querySelector(":not([data-letter])"));
     }
 
     // allows onscreen/device keyboard backspace to remove letters from guess input
@@ -181,10 +190,14 @@ fetch("words.json")
       // once validated, player is blocked from submitting another guess word until evaluation engine is done
       blockPlayerInput();
       activeTiles.forEach((...params) => {
-        // passes validated guessword to evaluation engine
+        playerGuess.push(...params);
+      });
+      activeTiles.forEach((...params) => {
+        // passes validated guessword to evaluation engine letter by letter
         evaluateGuess(...params, guessWord);
       });
     }
+    console.log(playerGuess);
 
     // error message for validation checks in submitGuess()
     function showAlert(message, duration = 200) {
@@ -231,4 +244,12 @@ fetch("words.json")
         }, (index * DANCE_ANIMATION_DURATION) / 5);
       });
     }
+
+    ///////////////////////////////////
+    // CPU ENGINE
+    ///////////////////////////////////
+
+    const noTargetWord = data.filter((x) => x != targetWord);
+    const badLetters = [];
+    // console.log(badLetters);
   });

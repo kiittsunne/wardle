@@ -111,7 +111,7 @@ fetch("words.json")
     // listens for player input either through onscreen/ device keyboard
     function handleCpuInput() {
       document
-        .querySelector("#cpuSide")
+        .querySelector("[data-cpu-keyboard]")
         .addEventListener("click", handleOnscreenKeyboard);
     }
     handleCpuInput();
@@ -124,7 +124,7 @@ fetch("words.json")
 
     function handlePlayerInput() {
       document
-        .querySelector("#playerSide")
+        .querySelector("[data-player-keyboard]")
         .addEventListener("click", handleOnscreenKeyboard);
       document.addEventListener("keydown", handleDeviceKeyboard);
     }
@@ -146,7 +146,7 @@ fetch("words.json")
         return;
       }
       if (event.target.matches("[data-player-key]")) {
-        setLetter({ playerKey: event.target.dataset.key });
+        setLetter({ playerKey: event.target.dataset.playerKey });
         return;
       }
       if (event.target.matches("[data-player-enter]")) {
@@ -206,6 +206,7 @@ fetch("words.json")
 
     // fills 1 letter per tile only
     function setLetter(key) {
+      console.log(key.playerKey);
       if (Object.keys(key)[0] === "playerKey") {
         const activePlayerTile = getActivePlayerTiles();
         if (activePlayerTile.length >= WORD_LENGTH) return;

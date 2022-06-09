@@ -1,8 +1,6 @@
 ///////////////////////////////////////////////
-//// CONSTANTS
+//// ANIMATION CONSTANTS
 ///////////////////////////////////////////////
-const TOTAL_WORDS = 5757; // total number of words in words.json
-const WORD_LENGTH = 5; // each guess word is 5 letters long
 const FLIP_ANIMATION_DURATION = 300; // total animation duration for tile flips
 const DANCE_ANIMATION_DURATION = 300; // total animation duration for tile dance
 
@@ -22,10 +20,18 @@ const playerGuess = [];
 fetch("words.json")
   .then((res) => res.json())
   .then((data) => {
+    const WORD_LENGTH = data[0].length; // each guess word is 5 letters long
+
+    const noDupes = data.filter((word) => {
+      let noDupeWord = Array.from(new Set(word));
+      if (noDupeWord.length == WORD_LENGTH) return word;
+    });
+    const TOTAL_WORDS = noDupes.length; // total number of words in words.json
+
     ///////////////////////////////////
     // SELECTION ENGINE
     ///////////////////////////////////
-    const targetWord = data[Math.floor(Math.random() * TOTAL_WORDS)]; // target word needs to be declared inside fetch block
+    const targetWord = noDupes[Math.floor(Math.random() * TOTAL_WORDS)]; // target word needs to be declared inside fetch block
     console.log(targetWord); // left in only for demo, will be removed in production
 
     ///////////////////////////////////
@@ -64,8 +70,8 @@ fetch("words.json")
               "transitionend",
               () => {
                 checkWinCondition(guessWord, array);
-                handlePlayerInput();
                 storeCpuMemory(array);
+                handlePlayerInput();
               },
               { once: true }
             );
@@ -73,6 +79,7 @@ fetch("words.json")
         }
 
         if (array[0].dataset.owner === "player") {
+          // storeCpuMemory(array);
           if (index === array.length - 1) {
             tile.addEventListener(
               "transitionend",
@@ -80,11 +87,7 @@ fetch("words.json")
                 checkWinCondition(guessWord, array);
                 handleCpuInput();
                 storeCpuMemory(array);
-                if (previousCpuGuess.length === 0) {
-                  triggerFirstCpuGuess();
-                } else {
-                  triggerSubsequentCpuGuess();
-                }
+                triggerCpuGuess();
               },
               { once: true }
             );
@@ -322,35 +325,31 @@ fetch("words.json")
     ///////////////////////////////////
     // CPU ENGINE
     ///////////////////////////////////
-    const previousCpuGuess = [];
-    const previousPlayerGuess = [];
-    const playerBad = [];
-    const playerPlaced = [];
-    const playerValid = [];
-    const cpuBad = [];
-    const cpuPlaced = [];
-    const cpuValid = [];
+    const previousGuess = [];
+    const [rawBad, rawPlaced, rawValid] = [[], [], []];
 
     function storeCpuMemory(array) {
       let wordConstructor = [];
       if (array[0].dataset.owner == "player") {
-        // store previous player guess
+        // store information about player guesses
         for (let i = 0; i < array.length; i++) {
           wordConstructor.push(array[i].dataset.letter);
-          // store bad, placed, valid letters revealed by player
           for (let i = 0; i < array.length; i++) {
             if (array[i].dataset.state == "bad") {
-              cpuBad.push(array[i].dataset.letter);
-            } else if (array[i].dataset.state == "placed") {
-              cpuPlaced.push(array[i].dataset.letter);
-            } else {
-              playerValid.push(array[i].dataset.letter);
+              rawBad.push(array[i].dataset.letter);
+            }
+            if (array[i].dataset.state == "placed") {
+              rawValid.push(array[i].dataset.letter);
+            }
+            if (array[i].dataset.state == "valid") {
+              rawValid.push(array[i].dataset.letter);
             }
           }
         }
-        previousPlayerGuess.push(wordConstructor.join(""));
+        previousGuess.push(wordConstructor.join(""));
       }
 
+      // store information about cpu guesses
       if (array[0].dataset.owner == "cpu") {
         // store previous cpu guess
         for (let i = 0; i < array.length; i++) {
@@ -358,83 +357,127 @@ fetch("words.json")
           // store bad, placed, valid letters revealed by cpu
           for (let i = 0; i < array.length; i++) {
             if (array[i].dataset.state == "bad") {
-              cpuBad.push(array[i].dataset.letter);
-            } else if (array[i].dataset.state == "placed") {
+              rawBad.push(array[i].dataset.letter);
+            }
+            if (array[i].dataset.state == "placed") {
+              rawValid.push(array[i].dataset.letter);
               // for mvp purpose
-              cpuValid.push(array[i].dataset.letter);
-            } else {
-              cpuValid.push(array[i].dataset.letter);
+              // rawPlaced.push([array[i].dataset.letter, i]);
+            }
+            if (array[i].dataset.state == "valid") {
+              rawValid.push(array[i].dataset.letter);
             }
           }
         }
-        previousCpuGuess.push(wordConstructor.join(""));
+        previousGuess.push(wordConstructor.join(""));
       }
     }
 
-    function triggerFirstCpuGuess() {
-      let selectedWord = "";
-      selectedWord = data[Math.floor(Math.random() * TOTAL_WORDS - 1)];
-      lettersArr = Array.from(selectedWord.toUpperCase());
-      submitCpuInput(lettersArr);
-    }
+    // function triggerFirstCpuGuess() {
+    //   let selectedWord = "";
+    //   selectedWord = data[Math.floor(Math.random() * TOTAL_WORDS - 1)];
+    //   lettersArr = Array.from(selectedWord.toUpperCase());
+    //   submitCpuInput(lettersArr);
+    // }
 
-    function triggerSubsequentCpuGuess() {
-      let cpuBadUnique = Array.from(new Set(cpuBad));
-      let cpuPlacedUnique = Array.from(new Set(cpuPlaced));
-      let cpuValidUnique = Array.from(new Set(cpuValid));
-
-      // sauce: https://stackoverflow.com/a/52748440
-      function longList() {
-        return data.filter(function (word) {
-          return !cpuBadUnique.some(
-            (badLetter) =>
-              word.includes(badLetter) || word.includes(badLetter.toUpperCase())
-          );
-        });
+    function triggerCpuGuess() {
+      let uniqueBad = Array.from(new Set(rawBad));
+      let uniqueValid = Array.from(new Set(rawValid));
+      let uniquePlacedLetters = Array.from(new Set(rawPlaced));
+      let uniquePlaced = [];
+      ///////////////////////////////////////////////////////////
+      // cleans data for uniquePlaced = [[letter: "str", index: num]]
+      // let setPlacedFlat = Array.from(rawPlacedHelper);
+      // console.log(uniquePlacedLetters);
+      // console.log(previousGuess[previousGuess.length - 1][0]);
+      let placedLetter = [];
+      let placedIndex = [];
+      for (let i = 0; i < previousGuess[0].length; i++) {
+        if (
+          previousGuess[previousGuess.length - 1][i] == uniquePlacedLetters[i]
+        ) {
+          placedLetter.push(uniquePlacedLetters[i]);
+          placedIndex.push(i);
+        }
       }
-      const longListArr = longList();
-      console.log(longListArr);
-
-      function shortList() {
-        return longListArr.filter(function (word) {
-          return cpuValidUnique.some(
-            (goodletter) =>
-              word.includes(goodletter) ||
-              word.includes(goodletter.toUpperCase())
-          );
-        });
+      class placedLetterConstructor {
+        constructor(letter, index) {
+          (this.letter = letter), (this.index = index);
+        }
       }
-      const shortListArr = shortList();
-      console.log(shortListArr);
+      // console.log(placedLetter, placedIndex);
+      for (let i = 0; i < uniquePlacedLetters.length; i++) {
+        uniquePlaced.push(
+          new placedLetterConstructor(placedLetter[i], placedIndex[i])
+        );
+      }
+      // console.log(uniquePlaced);
+      // console.log(uniqueBad, uniqueValid, uniquePlaced);
+      ///////////////////////////////////////////////////////////
 
-      // function shortList() {
-      //   let shortListStorage = [];
-      //   shortListStorage = longListArr.filter((word) => {
-      //     for (let i = 0; i < cpuValidUnique.length; i++) {
-      //       if (word.includes(cpuValidUnique[i]) === true) {
-      //         return word;
-      //       }
-      //     }
-      //   });
-      //   return shortListStorage;
-      // }
-      // const shortListArr = shortList();
-      // console.log(shortListArr);
+      ///////////////////////////////////////////////////////////
+      // CONTAINS VALID filter: shortlists words with all valid letters
+      let containsValidDuplicates = [];
+      noDupes.filter((word) => {
+        for (let i = 0; i < uniqueValid.length; i++) {
+          if (word.includes(uniqueValid[i]) == true)
+            containsValidDuplicates.push(word);
+        }
+      });
+      let containsValidFrequency = {};
+      containsValidDuplicates.forEach((word) => {
+        containsValidFrequency[word] = (containsValidFrequency[word] || 0) + 1;
+      });
+      let filterValidByFrequency = Object.entries(containsValidFrequency);
+      let isolateContainsValid = filterValidByFrequency.filter(
+        (filteredWordsInArrayFormat) => {
+          if (filteredWordsInArrayFormat[1] === uniqueValid.length) {
+            return filteredWordsInArrayFormat;
+          }
+        }
+      );
+      let trueValid = [];
+      isolateContainsValid.forEach((wordArray) => trueValid.push(wordArray[0]));
+      console.log(containsValidDuplicates);
+      ///////////////////////////////////////////////////////////
 
-      // function shortShortList() {
-      //   let shortShortListStorage = [];
-      //   shortShortListStorage = shortListArr.filter(
-      //     (item, index) => shortListArr.indexOf(item) !== index
-      //   );
-      //   return shortShortListStorage;
-      // // }
-      // // const shortShortListArrHelper = shortShortList();
-      // // const shortShortListArr = Array.from(new Set(shortShortListArrHelper));
-      // console.log(shortShortListArr);
+      ///////////////////////////////////////////////////////////
+      // ELIMINATE BAD filter: removes words with bad letters from trueValid list
+      let trueValidWithoutBad = [];
+      let trueValidWithBad = trueValid.filter((word) => {
+        let checkword = Array.from(word);
+        for (let i = 0; i < word.length; i++) {
+          for (let j = 0; j < uniqueBad.length; j++) {
+            if (checkword[i] == uniqueBad[j]) return word;
+          }
+        }
+      });
+      trueValidWithoutBad = trueValid.filter((word) => {
+        if (!trueValidWithBad.includes(word)) return word;
+      });
+      console.log(trueValidWithoutBad);
+      ///////////////////////////////////////////////////////////
+
+      ///////////////////////////////////////////////////////////
+      // LOCATES PLACED filter: further shortlists words where placed letter is in correct slot
+      let trueValidWithoutBadWithPlaced = [];
+      trueValidWithoutBad.forEach((word) => {
+        for (let i = 0; i < uniquePlaced.length; i++) {
+          if (word.indexOf(uniquePlaced[i].letter) == uniquePlaced[i].index) {
+            trueValidWithoutBadWithPlaced.push(word);
+          }
+        }
+      });
+      ///////////////////////////////////////////////////////////
 
       let selectedWord;
-      selectedWord =
-        shortListArr[Math.floor(Math.random() * shortListArr.length - 1)];
+      if (trueValidWithoutBad.length == 0) {
+        selectedWord = noDuples[Math.floor(Math.random() * TOTAL_WORDS - 1)];
+      } else
+        selectedWord =
+          trueValidWithoutBad[
+            Math.floor(Math.random() * trueValidWithoutBad.length)
+          ];
       lettersArr = Array.from(selectedWord.toUpperCase());
       submitCpuInput(lettersArr);
       console.log(selectedWord);

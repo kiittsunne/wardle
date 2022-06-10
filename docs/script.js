@@ -15,6 +15,52 @@ const alertContainer = document.querySelector("[data-alert-container");
 const playerGuess = [];
 
 ///////////////////////////////////////////////
+//// WARDLE_ blinking title block
+///////////////////////////////////////////////
+
+const spanText = [
+  {
+    presetletters: "<span>WARDLE</span>",
+  },
+];
+
+let allLetters = document.getElementsByClassName("typingletters");
+for (let i = 0; i < allLetters.length; i++) {
+  let currentLetterId = allLetters[i].id;
+  let currentLetterIdContent = spanText[0][currentLetterId];
+  let element = document.getElementById(currentLetterId);
+  let presetText = currentLetterIdContent;
+
+  // type code
+  let j = 0,
+    isTag,
+    text;
+  (function type() {
+    text = presetText.slice(0, ++j);
+    if (text === presetText) return;
+    element.innerHTML = text + `<span class='blinker'> </span>`;
+    let char = text.slice(-1);
+    if (char === "<") isTag = true;
+    if (char === ">") isTag = false;
+    if (isTag) return type();
+    setTimeout(type, 100);
+  })();
+}
+
+const themeButtons = document.querySelectorAll(".themeButton");
+themeButtons.forEach((color) => {
+  color.addEventListener("click", function changeColor() {
+    let placedColor = color.getAttribute("data-placed-color");
+    let validColor = color.getAttribute("data-valid-color");
+    let badColor = color.getAttribute("data-bad-color");
+
+    document.querySelector(":root").style.setProperty("--placed", placedColor);
+    document.querySelector(":root").style.setProperty("--valid", validColor);
+    document.querySelector(":root").style.setProperty("--bad", badColor);
+  });
+});
+
+///////////////////////////////////////////////
 //// FETCH BLOCK: RETRIEVE WORDS.JSON DATA
 ///////////////////////////////////////////////
 fetch("words.json")
@@ -464,7 +510,7 @@ fetch("words.json")
 
       let selectedWord;
       if (trueValidWithoutBad.length == 0) {
-        selectedWord = noDuples[Math.floor(Math.random() * TOTAL_WORDS - 1)];
+        selectedWord = noDupes[Math.floor(Math.random() * TOTAL_WORDS - 1)];
       } else
         selectedWord =
           trueValidWithoutBad[

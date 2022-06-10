@@ -1,5 +1,5 @@
 *,
-*::after,
+/* *::after, */
 *::before {
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
@@ -9,7 +9,10 @@
   --background-standard: hsl(240, 3%, 7%);
   --grey-standard: hsl(206, 3%, 48%);
   --yellow-standard: hsl(51, 52%, 55%);
-  --green-standard: hsl(114, 28%, 53%);
+  --green-standard: hsl(116, 28%, 53%);
+  --placed: hsl(115, 28%, 53%);
+  --valid: hsl(51, 52%, 55%);
+  --bad: hsl(0, 0%, 25%);
 }
 
 body {
@@ -23,15 +26,56 @@ body {
   font-size: clamp(0.5rem, 2.5vmin, 1.5rem);
 }
 
-h1 {
-  color: white;
+#titleText {
+  height: 8vh;
+  width: 90vw;
+  margin-top: 2vh;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
+  font-size: 2.5em;
+  font-weight: bolder;
+}
+
+span {
+  color: var(--placed);
+  font-family: "Courier New", Courier, monospace;
+}
+
+.blinker {
+  opacity: 1;
+  margin-bottom: -2px;
+  height: 2px;
+  margin-left: -10px;
+  border-left: 0px solid var(--valid);
+  animation: blinker 0.9s steps(2, start) infinite;
+}
+
+@keyframes blinker {
+  to {
+    visibility: hidden;
+  }
+}
+
+#themeSetter {
+  width: 20vw;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1em;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+#themeSetter div {
+  cursor: pointer;
 }
 
 #mainContainer {
   height: 80vh;
   width: 90vw;
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
   display: flex;
   box-sizing: border-box;
   padding: 0.5em;
@@ -53,7 +97,7 @@ h1 {
 
 .alertContainer {
   position: fixed;
-  top: 10vh;
+  top: 15vh;
   left: 50vw;
   transform: translateX(-50%);
   z-index: 1;
@@ -94,7 +138,7 @@ h1 {
 .keyboard {
   display: grid;
   /* sauce (couldn't get the staggered keys look without this) - https://stackoverflow.com/questions/51284823/how-to-offset-a-div-in-a-css-grid */
-  grid-template-columns: repeat(20, minmax(auto, 1em));
+  grid-template-columns: repeat(20, minmax(auto, 0.65em));
   grid-auto-rows: 3em;
   gap: 0.25em;
   justify-content: center;
@@ -112,7 +156,7 @@ h1 {
   background-color: hsl(
     var(--hue, 200),
     var(--saturation, 1%),
-    calc(var(--lightness-offset, 0%) + var(--lightness, 48%))
+    calc(var(--lightness-offset, 0%) + var(--lightness, 38%))
   );
   color: white;
   fill: white;
@@ -136,25 +180,22 @@ h1 {
 }
 
 .key.bad {
-  --lightness: 23%;
+  background-color: var(--bad);
 }
 
 .key.valid {
-  --hue: 49;
-  --saturation: 51%;
-  --lightness: 47%;
+  background-color: var(--valid);
 }
 
 .key.placed {
-  --hue: 115;
-  --saturation: 29%;
-  --lightness: 43%;
+  background-color: var(--placed);
 }
 
 .playerLabel {
   text-align: center;
   margin: 1.5em;
   color: white;
+  font-family: "Courier New", Courier, monospace;
 }
 
 .tile {
@@ -172,22 +213,22 @@ h1 {
 }
 
 .tile[data-state="active"] {
-  border-color: hsl(200, 1%, 34%);
+  border-color: rgba(242, 242, 242, 0.342);
 }
 
 .tile[data-state="bad"] {
   border: none;
-  background-color: hsl(240, 2%, 23%);
+  background-color: var(--bad);
 }
 
 .tile[data-state="valid"] {
   border: none;
-  background-color: hsl(49, 51%, 47%);
+  background-color: var(--valid);
 }
 
 .tile[data-state="placed"] {
   border: none;
-  background-color: hsl(114, 29%, 43%);
+  background-color: var(--placed);
 }
 
 .tile.shake {

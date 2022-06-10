@@ -47,7 +47,7 @@ span {
   margin-bottom: -2px;
   height: 2px;
   margin-left: -10px;
-  border-left: 0px solid var(--valid);
+  border-left: 0px solid var(--placed);
   animation: blinker 0.9s steps(2, start) infinite;
 }
 

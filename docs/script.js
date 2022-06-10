@@ -47,6 +47,10 @@ for (let i = 0; i < allLetters.length; i++) {
   })();
 }
 
+///////////////////////////////////////////////
+//// Theme setter block, sauce: https://www.youtube.com/watch?v=3Qr6-WHtIRc
+///////////////////////////////////////////////
+
 const themeButtons = document.querySelectorAll(".themeButton");
 themeButtons.forEach((color) => {
   color.addEventListener("click", function changeColor() {

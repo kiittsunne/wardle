@@ -166,14 +166,64 @@ Wardle is a Wordle clone with a turn-based twist. The player will race against a
 
 ---
 
-### Daily Retrospective
+### Retrospective
 
-#### Monday:
+#### Most Interesting Part
 
-#### Tuesday:
+Learning about event dispatchers ~
 
-#### Wednesday:
+```javascript
+function submitCpuInput(lettersArr) {
+  lettersArr.push("GO");
+  let interval = 200;
+  let increment = 1;
+  let clickEvent = new Event("click", { bubbles: true });
+  // sauce: https://stackoverflow.com/questions/25256535/javascript-set-interval-for-each-array-value-setinterval-array-foreach/37215055#37215055
+  for (let i = 0; i <= WORD_LENGTH; i++) {
+    let runner = setTimeout(() => {
+      document
+        .querySelector(`[data-cpu-key="${lettersArr[i]}"]`)
+        .dispatchEvent(clickEvent);
+      clearTimeout(runner);
+    }, interval * increment);
+    increment++;
+  }
+}
+```
 
-#### Thursday:
+#### Hardest Part
 
-#### Presentation & Afterthoughts:
+Ensuring that all valid letters are included in the shortlisted words
+
+```javascript
+///////////////////////////////////////////////////////////
+// CONTAINS VALID filter: shortlists words with all valid letters
+let containsValidDuplicates = [];
+noDupes.filter((word) => {
+  for (let i = 0; i < uniqueValid.length; i++) {
+    if (word.includes(uniqueValid[i]) == true)
+      containsValidDuplicates.push(word);
+  }
+});
+let containsValidFrequency = {};
+containsValidDuplicates.forEach((word) => {
+  containsValidFrequency[word] = (containsValidFrequency[word] || 0) + 1;
+});
+let filterValidByFrequency = Object.entries(containsValidFrequency);
+let isolateContainsValid = filterValidByFrequency.filter(
+  (filteredWordsInArrayFormat) => {
+    if (filteredWordsInArrayFormat[1] === uniqueValid.length) {
+      return filteredWordsInArrayFormat;
+    }
+  }
+);
+let trueValid = [];
+isolateContainsValid.forEach((wordArray) => trueValid.push(wordArray[0]));
+console.log(containsValidDuplicates);
+///////////////////////////////////////////////////////////
+```
+
+#### Stuff Left to do
+
+- Add in a button to switch between "easy" and "hard" mode
+- CSS theme changer - still half finished ~

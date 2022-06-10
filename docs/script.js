@@ -78,7 +78,6 @@ fetch("words.json")
         }
 
         if (array[0].dataset.owner === "player") {
-          // storeCpuMemory(array);
           if (index === array.length - 1) {
             tile.addEventListener(
               "transitionend",

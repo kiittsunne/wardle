@@ -387,9 +387,6 @@ fetch("words.json")
       let uniquePlaced = [];
       ///////////////////////////////////////////////////////////
       // cleans data for uniquePlaced = [[letter: "str", index: num]]
-      // let setPlacedFlat = Array.from(rawPlacedHelper);
-      // console.log(uniquePlacedLetters);
-      // console.log(previousGuess[previousGuess.length - 1][0]);
       let placedLetter = [];
       let placedIndex = [];
       for (let i = 0; i < previousGuess[0].length; i++) {
@@ -405,14 +402,11 @@ fetch("words.json")
           (this.letter = letter), (this.index = index);
         }
       }
-      // console.log(placedLetter, placedIndex);
       for (let i = 0; i < uniquePlacedLetters.length; i++) {
         uniquePlaced.push(
           new placedLetterConstructor(placedLetter[i], placedIndex[i])
         );
       }
-      // console.log(uniquePlaced);
-      // console.log(uniqueBad, uniqueValid, uniquePlaced);
       ///////////////////////////////////////////////////////////
 
       ///////////////////////////////////////////////////////////
@@ -438,7 +432,6 @@ fetch("words.json")
       );
       let trueValid = [];
       isolateContainsValid.forEach((wordArray) => trueValid.push(wordArray[0]));
-      console.log(containsValidDuplicates);
       ///////////////////////////////////////////////////////////
 
       ///////////////////////////////////////////////////////////
@@ -455,7 +448,6 @@ fetch("words.json")
       trueValidWithoutBad = trueValid.filter((word) => {
         if (!trueValidWithBad.includes(word)) return word;
       });
-      console.log(trueValidWithoutBad);
       ///////////////////////////////////////////////////////////
 
       ///////////////////////////////////////////////////////////
@@ -480,6 +472,5 @@ fetch("words.json")
           ];
       lettersArr = Array.from(selectedWord.toUpperCase());
       submitCpuInput(lettersArr);
-      console.log(selectedWord);
     }
   });

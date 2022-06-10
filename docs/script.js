@@ -71,7 +71,6 @@ fetch("words.json")
               () => {
                 checkWinCondition(guessWord, array);
                 storeCpuMemory(array);
-                handlePlayerInput();
               },
               { once: true }
             );
@@ -85,9 +84,10 @@ fetch("words.json")
               "transitionend",
               () => {
                 checkWinCondition(guessWord, array);
-                handleCpuInput();
                 storeCpuMemory(array);
-                triggerCpuGuess();
+                if (stopTrigger != "stop") {
+                  triggerCpuGuess();
+                }
               },
               { once: true }
             );
@@ -95,7 +95,7 @@ fetch("words.json")
         }
       });
     }
-
+    let stopTrigger;
     // triggers win condition animation if player guesses the word within 6 attempts, otherwise reveals the word and ends the round
     function checkWinCondition(guessWord, tiles) {
       if (guessWord === targetWord) {
@@ -103,6 +103,7 @@ fetch("words.json")
         blockPlayerInput();
         showAlert("Great Job!", 5000);
         danceTiles(tiles);
+        stopTrigger = "stop";
         return;
       }
       const checkGuessesLeft = cpuGrid.querySelectorAll(":not([data-letter])");
